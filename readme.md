@@ -27,9 +27,14 @@ You can register a callback that is triggered for each new basic block found (`l
 
 By adding an edge callback (`libxdc_register_edge_callback`) and enabling trace mode (`libxdc_enable_tracing`) you can perform a decoding where each edge taken is passed back to you for inspection. Manually enabling/disabling the trace mode is necessary,  since in contrast to the basic block callback this  slows down the decoding process.
 
-#### Warning:
+#### Warnings:
+
+You need to set at least one of the filter ranges. They need to be set to the same values used during the intel-pt tracing. If you do not configure the right ranges you will see an assertion `count_tnt(self->tnt_cache_state) != 0`.
 
 You need to append a single byte 0x55 to the trace, but excluded it from the trace size. This byte is used to mark the end of the input and allows us to increase the performance during decoding. If you do not do this, an assertion is raised.
+
+This decoder expects that return compression and generation of CYC, TSC and MTC packets are disabled.
+You can disable those options if you are using perf. KVM-PT disables them by default. To manually disable return compression set bit 11 (`DisRETC`) in `IA32_RTIT_CTL` MSR to 1. CYC, MTC and TSC packet generation can be disabled if bit 1 (`CYCEn`), bit 9 (`MTCEn`) and bit 10 (`TSCEn`) are set to 0. 
 
 ## Performance Evaluation
 
